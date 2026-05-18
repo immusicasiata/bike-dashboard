@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+test.py
+hello_world.py
+
+# Streamlit
+.streamlit/
+
+# Entornos virtuales
+venv/
+env/
+
+# VSCode
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Mac
+.DS_Store
