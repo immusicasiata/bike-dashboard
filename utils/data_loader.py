@@ -6,9 +6,12 @@ import numpy as np
 ######## No vuelvas a ejecutar esta función cada vez que el usuario interactúe #########
 def load_data():
 
-    df = pd.read_csv(
-        "data/202603-capitalbikeshare-tripdata.csv"
+    df = pd.read_parquet(
+        "data/202603-capitalbikeshare-tripdata.parquet"
     )
+    #df = pd.read_csv(
+    #    "data/202603-capitalbikeshare-tripdata.csv"
+    #)
 
     # -----------------------------------------------------
     # CONVERSIÓN DE FECHAS
