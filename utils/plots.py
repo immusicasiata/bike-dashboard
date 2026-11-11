@@ -1,4 +1,4 @@
-import plotly.express as px
+    import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 
@@ -117,18 +117,27 @@ def plot_user_type_distribution(df):
 # =========================================================
 # GRÁFICO 2.1 - Mapa de estaciones
 # =========================================================
+
 def plot_station_map(df):
 
     stations = (
         df.groupby('start_station_name').agg(
-            trip_count=('ride_id', 'count'),           # número de viajes
-            start_lat=('start_lat', 'mean'),    # media de latitud
-            start_lng=('start_lng', 'mean')     # media de longitud
-            ).reset_index()
+            trip_count=('ride_id', 'count'),
+            start_lat=('start_lat', 'mean'),
+            start_lng=('start_lng', 'mean')
+        ).reset_index()
     )
 
-    stations = stations.rename(columns={'trip_count': 'Conteo de viajes'})
-    fig = px.scatter_mapbox(
+    stations = stations.rename(
+        columns={'trip_count': 'Conteo de viajes'}
+    )
+
+    # Eliminar estaciones sin coordenadas válidas
+    stations = stations.dropna(
+        subset=['start_lat', 'start_lng']
+    )
+
+    fig = px.scatter_map(
         stations,
         lat="start_lat",
         lon="start_lng",
@@ -141,16 +150,20 @@ def plot_station_map(df):
             "start_lng": False
         },
         zoom=10,
+        map_style="carto-positron",
         title="Uso de Estaciones"
     )
-    fig.update_traces(marker=dict(sizemin=2))
+
+    fig.update_traces(
+        marker=dict(sizemin=2)
+    )
+
     fig.update_layout(
-        mapbox_style="carto-positron",
         margin={
-            "r":0,
-            "t":50,
-            "l":0,
-            "b":0
+            "r": 0,
+            "t": 50,
+            "l": 0,
+            "b": 0
         },
         height=700
     )
@@ -158,36 +171,34 @@ def plot_station_map(df):
     return fig
 
 
+
 # =========================================================
-# GRÁFICO 2.2 - distribución por niveles de demanda 
+# GRÁFICO 2.2 - Distribución por niveles de demanda
 # =========================================================
 
 def plot_station_activity_levels(df):
 
-    # =====================================================
     # AGRUPAR ESTACIONES
-    # =====================================================
-
     stations = (
         df.groupby('start_station_name').agg(
-            trip_count=('ride_id', 'count'),           # número de viajes
-            start_lat=('start_lat', 'mean'),    # media de latitud
-            start_lng=('start_lng', 'mean')     # media de longitud
-            ).reset_index()
+            trip_count=('ride_id', 'count'),
+            start_lat=('start_lat', 'mean'),
+            start_lng=('start_lng', 'mean')
+        ).reset_index()
     )
-    
-    stations = stations.rename(columns={'trip_count': 'Cantidad de Viajes'})
-    # =====================================================
-    # SEGMENTACIÓN
-    # =====================================================
 
+    stations = stations.rename(
+        columns={'trip_count': 'Cantidad de Viajes'}
+    )
+
+    # SEGMENTACIÓN
     q1 = stations["Cantidad de Viajes"].quantile(0.25)
     q2 = stations["Cantidad de Viajes"].quantile(0.50)
     q3 = stations["Cantidad de Viajes"].quantile(0.75)
+
     max_trips = stations["Cantidad de Viajes"].max()
 
     bins = [0, q1, q2, q3, max_trips + 1]
-
 
     stations["Nivel de Demanda"] = pd.cut(
         stations["Cantidad de Viajes"],
@@ -197,54 +208,43 @@ def plot_station_activity_levels(df):
             "Media",
             "Alta",
             "Muy Alta"
-        ],
+        ]
     )
 
-    # =====================================================
     # MAPA
-    # =====================================================
-
-    fig = px.scatter_mapbox(
-
+    fig = px.scatter_map(
         stations,
-
         lat="start_lat",
         lon="start_lng",
-
         size="Cantidad de Viajes",
-
         color="Nivel de Demanda",
-
         hover_name="start_station_name",
-
         hover_data={
             "Cantidad de Viajes": ":,.0f",
             "start_lat": False,
             "start_lng": False
         },
-
         zoom=10,
-
+        map_style="carto-positron",
         title="Niveles de Demanda por Estación"
     )
 
-    fig.update_traces(marker=dict(sizemin=2))
+    fig.update_traces(
+        marker=dict(sizemin=2)
+    )
 
     fig.update_layout(
-
-        mapbox_style="carto-positron",
-
         margin={
-            "r":0,
-            "t":60,
-            "l":0,
-            "b":0
+            "r": 0,
+            "t": 60,
+            "l": 0,
+            "b": 0
         },
-
         height=700
     )
 
     return fig
+
 
 # =========================================================
 # GRÁFICO 2.3 - Top estaciones
